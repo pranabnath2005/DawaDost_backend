@@ -26,7 +26,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://YOUR-FRONTEND-DOMAIN.vercel.app",
+      "https://dawadostfrontend-two.vercel.app/Login",
     ],
     credentials: true,
   })
@@ -35,7 +35,19 @@ app.use(
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-// API Routes
+// ===============================
+// API HEALTH CHECK
+// ===============================
+app.get("/api", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "DawaDost API is running successfully 🚀",
+  });
+});
+
+// ===============================
+// API ROUTES
+// ===============================
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/notifications", notificationRoutes);
@@ -45,7 +57,9 @@ app.use("/api/users", userRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
-// Test route
+// ===============================
+// ROOT TEST ROUTE
+// ===============================
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
@@ -53,7 +67,9 @@ app.get("/", (req, res) => {
   });
 });
 
-// Global error handler
+// ===============================
+// GLOBAL ERROR HANDLER
+// ===============================
 app.use((err, req, res, next) => {
   console.error("SERVER ERROR:", err);
 
