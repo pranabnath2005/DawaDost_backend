@@ -18,20 +18,27 @@ dotenv.config();
 
 const app = express();
 
-// Connect MongoDB
+// ===============================
+// CONNECT MONGODB
+// ===============================
 connectDB();
 
-// Middleware
+// ===============================
+// CORS
+// ===============================
 app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://dawadostfrontend-two.vercel.app/Login",
+      "https://dawadostfrontend-two.vercel.app",
     ],
     credentials: true,
   })
 );
 
+// ===============================
+// BODY PARSER
+// ===============================
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
@@ -86,7 +93,11 @@ app.use((err, req, res, next) => {
   });
 });
 
-// IMPORTANT:
-// Do NOT use app.listen() on Vercel.
+// ===============================
+// START SERVER FOR RENDER
+// ===============================
+const PORT = process.env.PORT || 5000;
 
-export default app;
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`DawaDost server running on port ${PORT}`);
+});
