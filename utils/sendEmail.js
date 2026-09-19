@@ -1,46 +1,34 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendEmail = async ({ to, subject, html }) => {
   try {
-    // 🔴 HARD VALIDATION
     if (!to) {
       throw new Error("Recipient email (to) is missing");
     }
 
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      throw new Error("EMAIL_USER or EMAIL_PASS not set in .env");
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error("RESEND_API_KEY is not configured");
     }
 
-    // 📧 CREATE TRANSPORTER
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false, // TLS
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS, // App Password only
-      },
-      tls: {
-        rejectUnauthorized: false, // prevent cert issues (safe for Gmail)
-      },
-    });
-
-    // 🔍 VERIFY SMTP CONNECTION (IMPORTANT)
-    await transporter.verify();
-    console.log("✅ SMTP connection verified");
-
-    // 📩 SEND EMAIL
-    await transporter.sendMail({
-      from: `"Dawa Dost" <${process.env.EMAIL_USER}>`,
-      to,
+    const { data, error } = await resend.emails.send({
+      from: "Dawa Dost <onboarding@resend.dev>",
+      to: [to],
       subject,
       html,
     });
 
-    console.log("✅ Email successfully sent to:", to);
+    if (error) {
+      console.error("❌ Resend error:", error);
+      throw new Error(error.message || "Email could not be sent");
+    }
+
+    console.log("✅ Email successfully sent:", data.id);
+
+    return data;
   } catch (error) {
-    console.error("❌ Email sending failed:");
-    console.error(error);
+    console.error("❌ Email sending failed:", error);
     throw new Error("Email could not be sent");
   }
 };
